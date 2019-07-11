@@ -88,7 +88,12 @@ def spm_hrf(tr, oversampling=50, time_length=32., onset=0.):
     return _gamma_difference_hrf(tr, oversampling, time_length, onset)
 
 
-def MION_hrf_leite(tr, oversampling=60, time_length=40., onset=0.):
+def mion_hrf(tr, oversampling=60, time_length=40., onset=0.):
+    '''https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dDeconvolve.html
+    
+    this is originally from:
+    FP Leite, et al. NeuroImage 16:283-294 (2002)    
+    http://dx.doi.org/10.1006/nimg.2002.1110'''
     dt = tr / oversampling
     time_stamps = np.linspace(0, time_length, np.rint(float(time_length) / dt).astype(np.int))
     time_stamps -= onset
@@ -416,13 +421,14 @@ def _hrf_kernel(hrf_model, tr, oversampling=50, fir_delays=None):
         samples of the hrf (the number depends on the hrf_model used)
     """
     acceptable_hrfs = [
-        'spm', 'MION', 'spm + derivative', 'spm + derivative + dispersion', 'fir',
-        'glover', 'glover + derivative', 'glover + derivative + dispersion',
+        'spm', 'mion', 'spm + derivative', 'spm + derivative + dispersion',
+        'fir', 'glover', 'glover + derivative',
+        'glover + derivative + dispersion',
         None]
     if hrf_model == 'spm':
         hkernel = [spm_hrf(tr, oversampling)]
     elif hrf_model == 'MION':
-        hkernel = [MION_hrf_leite(tr, oversampling)]
+        hkernel = [mion_hrf(tr, oversampling)]
     elif hrf_model == 'spm + derivative':
         hkernel = [spm_hrf(tr, oversampling),
                    spm_time_derivative(tr, oversampling)]
@@ -495,6 +501,7 @@ def compute_regressor(exp_condition, hrf_model, frame_times, con_id='cond',
      - 'spm': this is the hrf model used in SPM
      - 'spm + derivative': SPM model plus its time derivative (2 regressors)
      - 'spm + time + dispersion': idem, plus dispersion derivative (3 regressors)
+     - 'mion': this is the model used by FP Leite, et al. NeuroImage 16:283-294 (2002) 
      - 'glover': this one corresponds to the Glover hrf
      - 'glover + derivative': the Glover hrf + time derivative (2 regressors)
      - 'glover + derivative + dispersion': idem + dispersion derivative
