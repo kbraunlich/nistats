@@ -422,7 +422,7 @@ def _hrf_kernel(hrf_model, tr, oversampling=50, fir_delays=None):
     """
     acceptable_hrfs = [
         'spm', 'mion', 'spm + derivative', 'spm + derivative + dispersion',
-        'mion','fir', 'glover', 'glover + derivative',
+        'fir', 'glover', 'glover + derivative',
         'glover + derivative + dispersion',
         None]
     if hrf_model == 'spm':
