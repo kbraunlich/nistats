@@ -89,11 +89,31 @@ def spm_hrf(tr, oversampling=50, time_length=32., onset=0.):
 
 
 def mion_hrf(tr, oversampling=60, time_length=40., onset=0.):
-    '''https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dDeconvolve.html
+    """ Implementation of the monocrystalline iron oxide nanoparticle 
+    (MION) hrf model (Leite, et al. NeuroImage 16:283-294 (2002);
     
-    this is originally from:
-    FP Leite, et al. NeuroImage 16:283-294 (2002)    
-    http://dx.doi.org/10.1006/nimg.2002.1110'''
+    http://dx.doi.org/10.1006/nimg.2002.1110
+    https://afni.nimh.nih.gov/pub/dist/doc/program_help/3dDeconvolve.html
+    
+    Parameters
+    ----------
+    tr : float
+        scan repeat time, in seconds
+
+    oversampling : int, optional
+        temporal oversampling factor
+
+    time_length : float, optional
+        hrf kernel length, in seconds
+
+    onset : float, optional
+        hrf onset time, in seconds
+
+    Returns
+    -------
+    hrf: array of shape(length / tr * oversampling, dtype=float)
+         hrf sampling on the oversampled time grid
+    """
     dt = tr / oversampling
     time_stamps = np.linspace(0, time_length, np.rint(float(time_length) / dt).astype(np.int))
     time_stamps -= onset
@@ -422,7 +442,7 @@ def _hrf_kernel(hrf_model, tr, oversampling=50, fir_delays=None):
     """
     acceptable_hrfs = [
         'spm', 'mion', 'spm + derivative', 'spm + derivative + dispersion',
-        'fir', 'glover', 'glover + derivative',
+        'mion','fir', 'glover', 'glover + derivative',
         'glover + derivative + dispersion',
         None]
     if hrf_model == 'spm':
