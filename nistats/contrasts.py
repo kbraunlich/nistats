@@ -6,10 +6,11 @@ Author: Bertrand Thirion, Martin Perez-Guevara, 2016
 """
 
 from warnings import warn
+
 import numpy as np
 import scipy.stats as sps
 
-from .utils import multiple_mahalanobis, z_score
+from .utils import z_score
 
 
 DEF_TINY = 1e-50
@@ -88,6 +89,7 @@ def _fixed_effect_contrast(labels, results, con_vals, contrast_type=None):
     Adds the same contrast applied to all labels and results lists.
     """
     contrast = None
+    n_contrasts = 0
     for i, (lab, res, con_val) in enumerate(zip(labels, results, con_vals)):
         if np.all(con_val == 0):
             warn('Contrast for session %d is null' % i)
@@ -97,9 +99,10 @@ def _fixed_effect_contrast(labels, results, con_vals, contrast_type=None):
             contrast = contrast_
         else:
             contrast = contrast + contrast_
+        n_contrasts += 1
     if contrast is None:
         raise ValueError('all contrasts provided were null contrasts')
-    return contrast
+    return contrast * (1. / n_contrasts)
 
 
 class Contrast(object):
@@ -113,8 +116,8 @@ class Contrast(object):
     (high-dimensional F constrasts may lead to memory breakage).
     """
 
-    def __init__(self, effect, variance, dim=None, dof=DEF_DOFMAX, contrast_type='t',
-                 tiny=DEF_TINY, dofmax=DEF_DOFMAX):
+    def __init__(self, effect, variance, dim=None, dof=DEF_DOFMAX,
+                 contrast_type='t', tiny=DEF_TINY, dofmax=DEF_DOFMAX):
         """
         Parameters
         ----------
@@ -183,7 +186,7 @@ class Contrast(object):
 
         # Case: one-dimensional contrast ==> t or t**2
         if self.contrast_type == 'F':
-            stat = np.sum((self.effect - baseline) ** 2, 0) / self.dim  /\
+            stat = np.sum((self.effect - baseline) ** 2, 0) / self.dim /\
                 np.maximum(self.variance, self.tiny)
         elif self.contrast_type == 't':
             # avoids division by zero
@@ -191,8 +194,8 @@ class Contrast(object):
                 np.maximum(self.variance, self.tiny))
         else:
             raise ValueError('Unknown statistic type')
-        self.stat_ = stat
-        return stat.ravel()
+        self.stat_ = stat.ravel()
+        return self.stat_
 
     def p_value(self, baseline=0.0):
         """Return a parametric estimate of the p-value associated

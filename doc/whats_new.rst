@@ -1,3 +1,26 @@
+0.1.0rc
+=======
+
+Changelog
+---------
+
+.. warning::
+
+ | period_cut (in seconds) has been replaced by high_pass (in Hz)
+ | in FirstLevelModel & design matrices.
+ | This is a code-breaking change. Please update your code accordingly.
+
+Fixes
+-----
+
+* Removed Python 2 deprecation warning for Python 3 installations.
+* fixed effect contrasts now average effect sizes across runs rather than
+  summing them.
+
+Contributors
+------------
+
+
 0.0.1b
 =======
 
@@ -22,6 +45,9 @@ Changelog
       to 50 and exposed this parameter.
     * changed the term ``paradigm`` to ``events`` and made it
       BIDS-compliant. Set the event file to be tab-separated
+    * ``FirstLevelModel.compute_contrasts`` parameter ``output_type`` can
+      take the value ``'all'``, returning a dictionary of images for each
+      output type
 
 * Certain functions and methods have been renamed for clarity
     * ``nistats.design_matrix``
