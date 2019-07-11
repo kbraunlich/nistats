@@ -2,7 +2,7 @@
 
 """
 This module is for hemodynamic reponse function (hrf) specification.
-Here we provide for SPM, Glover hrfs and finite timpulse response (FIR) models.
+Here we provide for SPM, MION, Glover hrfs and finite timpulse response (FIR) models.
 This module closely follows SPM implementation
 
 Author: Bertrand Thirion, 2011--2018
