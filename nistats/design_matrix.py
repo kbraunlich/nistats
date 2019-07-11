@@ -314,7 +314,7 @@ def make_first_level_design_matrix(
         which defines the different conditions in the experimental paradigm.
 
     hrf_model : {'spm', 'spm + derivative', 'spm + derivative + dispersion',
-        'glover', 'glover + derivative', 'glover + derivative + dispersion',
+        'mion', 'glover', 'glover + derivative', 'glover + derivative + dispersion',
         'fir', None}, optional,
         Specifies the hemodynamic response function
 
