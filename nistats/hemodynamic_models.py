@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 This module is for hemodynamic reponse function (hrf) specification.
 Here we provide for SPM, Glover hrfs and finite timpulse response (FIR) models.
@@ -84,6 +86,21 @@ def spm_hrf(tr, oversampling=50, time_length=32., onset=0.):
          hrf sampling on the oversampled time grid
     """
     return _gamma_difference_hrf(tr, oversampling, time_length, onset)
+
+
+def MION_hrf_leite(tr, oversampling=60, time_length=40., onset=0.):
+    dt = tr / oversampling
+    time_stamps = np.linspace(0, time_length, np.rint(float(time_length) / dt).astype(np.int))
+    time_stamps -= onset
+
+    hrf = np.zeros_like(time_stamps)
+
+    for i,t in enumerate(time_stamps):
+        hrf[i]  = - 16.4486 * ( - 0.184/ 1.5 * np.exp(-t / 1.5)   
+                                + 0.330/ 4.5 * np.exp(-t / 4.5)
+                                + 0.670/13.5 * np.exp(-t / 13.5) )
+    return hrf
+
 
 
 def glover_hrf(tr, oversampling=50, time_length=32., onset=0.):
@@ -399,11 +416,13 @@ def _hrf_kernel(hrf_model, tr, oversampling=50, fir_delays=None):
         samples of the hrf (the number depends on the hrf_model used)
     """
     acceptable_hrfs = [
-        'spm', 'spm + derivative', 'spm + derivative + dispersion', 'fir',
+        'spm', 'MION', 'spm + derivative', 'spm + derivative + dispersion', 'fir',
         'glover', 'glover + derivative', 'glover + derivative + dispersion',
         None]
     if hrf_model == 'spm':
         hkernel = [spm_hrf(tr, oversampling)]
+    elif hrf_model == 'MION':
+        hkernel = [MION_hrf_leite(tr, oversampling)]
     elif hrf_model == 'spm + derivative':
         hkernel = [spm_hrf(tr, oversampling),
                    spm_time_derivative(tr, oversampling)]
